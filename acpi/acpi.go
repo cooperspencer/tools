@@ -59,6 +59,7 @@ type CoolingInformation struct {
 	Number       int
 	Processor    int
 	ProcessorMax int
+	Note         string
 	// add state information
 }
 
@@ -243,16 +244,14 @@ func parseBattery(raw map[int][][]byte) (information []*BatteryInformation, err 
 // parseAdapter ..
 //
 func parseAdapter(raw map[int][][]byte) (information []*AdapterInformation, err error) {
-	/*
-		for _, values := range raw {
-			info := &AdapterInformation{}
-			for _, value := range values {
-				//todo
-				fmt.Println(string(value))
-			}
-			information = append(information, info)
+	for key, values := range raw {
+		info := &AdapterInformation{}
+		info.Number = key
+		for _, value := range values {
+			info.Status = string(bytes.TrimSpace(value))
 		}
-	*/
+		information = append(information, info)
+	}
 	return
 }
 
@@ -260,16 +259,22 @@ func parseAdapter(raw map[int][][]byte) (information []*AdapterInformation, err 
 // parseThermal ...
 //
 func parseThermal(raw map[int][][]byte) (information []*ThermalInformation, err error) {
-	/*
-		for _, values := range raw {
-			info := &ThermalInformation{}
-			for _, value := range values {
-				//todo
-				fmt.Println(string(value))
+	for key, values := range raw {
+		info := &ThermalInformation{}
+		info.Number = key
+		for _, value := range values {
+			splittedVal := bytes.Split(value, []byte(","))
+			//todo
+			if len(splittedVal) == 2 {
+				//info.Status
+				//info.Degree
+				//info.Unit
+				continue
 			}
-			information = append(information, info)
+			//info.CriticalTripPoint
 		}
-	*/
+		information = append(information, info)
+	}
 	return
 }
 
@@ -277,15 +282,26 @@ func parseThermal(raw map[int][][]byte) (information []*ThermalInformation, err 
 // parseCooling ...
 //
 func parseCooling(raw map[int][][]byte) (information []*CoolingInformation, err error) {
-	/*
-		for _, values := range raw {
-			info := &CoolingInformation{}
-			for _, value := range values {
-				//todo
-				fmt.Println(string(value))
+	for key, values := range raw {
+		info := &CoolingInformation{}
+		info.Number = key
+		for _, value := range values {
+
+			if bytes.Equal(bytes.TrimSpace(value)[0:9], []byte("Processor")) {
+				splittedProc := bytes.Split(bytes.TrimSpace(value)[9:], []byte(" of "))
+				proc, err := strconv.Atoi(string(bytes.TrimSpace(splittedProc[0])))
+				if err == nil {
+					info.Processor = proc
+				}
+				procMax, err := strconv.Atoi(string(bytes.TrimSpace(splittedProc[1])))
+				if err == nil {
+					info.ProcessorMax = procMax
+				}
+				continue
 			}
-			information = append(information, info)
+			info.Note = string(bytes.TrimSpace(value))
 		}
-	*/
+		information = append(information, info)
+	}
 	return
 }
