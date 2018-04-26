@@ -186,7 +186,6 @@ func Parse(raw []byte) (*ACPI, error) {
 			break
 		}
 	}
-	fmt.Println(info)
 	return info, nil
 }
 
