@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// path stores information on the acpi location
 var path string
 
 //
