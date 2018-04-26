@@ -6,7 +6,6 @@ import (
 	"log"
 	"os/exec"
 	"strconv"
-	"strings"
 )
 
 // path stores information on the acpi location
@@ -144,11 +143,11 @@ func Parse(raw []byte) (*ACPI, error) {
 			tmpMap[string(kv[0][:7])] = make(map[int][][]byte)
 		}
 
-		number, err := strconv.Atoi(strings.Trim(string(kv[0][7:]), " "))
+		number, err := strconv.Atoi(string(bytes.TrimSpace(kv[0][7:])))
 		if err != nil {
 			fmt.Println(err)
 		}
-		tmpMap[string(kv[0][:7])][number] = append(tmpMap[string(kv[0][:7])][0], kv[1])
+		tmpMap[string(kv[0][:7])][number] = append(tmpMap[string(kv[0][:7])][number], kv[1])
 	}
 
 	for k, v := range tmpMap {
@@ -193,7 +192,50 @@ func Parse(raw []byte) (*ACPI, error) {
 // parseBattery ...
 //
 func parseBattery(raw map[int][][]byte) (information []*BatteryInformation, err error) {
-	//todo
+	for key, values := range raw {
+		info := &BatteryInformation{}
+		info.Number = key
+		for _, value := range values {
+
+			splitted := bytes.Split(value, []byte(","))
+
+			if bytes.Contains(splitted[0], []byte("capacity")) {
+				designSplit := bytes.Split(bytes.TrimSpace(splitted[0]), []byte("design capacity"))
+
+				dc, err := strconv.Atoi(string(bytes.TrimSpace(designSplit[1][:len(designSplit[1])-3])))
+				if err == nil {
+					info.DesignCapacity = dc
+				}
+
+				lastFullSplit := bytes.Split(bytes.TrimSpace(splitted[1]), []byte("last full capacity"))
+
+				lastFullValues := bytes.Split(lastFullSplit[1], []byte("="))
+				lastFullValues[0] = bytes.TrimSpace(lastFullValues[0])
+				lastFullValues[1] = bytes.TrimSpace(lastFullValues[1])
+
+				lfc, err := strconv.Atoi(string(bytes.TrimSpace(lastFullValues[0][:len(lastFullValues[0])-3])))
+				if err == nil {
+					info.LastFullCapacity = lfc
+				}
+
+				lfcp, err := strconv.Atoi(string(bytes.TrimSpace(lastFullValues[1][:len(lastFullValues[1])-1])))
+				if err == nil {
+					info.LastFullCapacityPercent = lfcp
+				}
+
+				continue
+			}
+
+			// non capacity line
+			info.Status = string(bytes.TrimSpace(splitted[0]))
+			level, err := strconv.Atoi(string(bytes.TrimSpace(splitted[1][:len(splitted[1])-1])))
+			if err == nil {
+				info.Level = level
+			}
+		}
+
+		information = append(information, info)
+	}
 	return
 }
 
@@ -201,7 +243,16 @@ func parseBattery(raw map[int][][]byte) (information []*BatteryInformation, err 
 // parseAdapter ..
 //
 func parseAdapter(raw map[int][][]byte) (information []*AdapterInformation, err error) {
-	//todo
+	/*
+		for _, values := range raw {
+			info := &AdapterInformation{}
+			for _, value := range values {
+				//todo
+				fmt.Println(string(value))
+			}
+			information = append(information, info)
+		}
+	*/
 	return
 }
 
@@ -209,7 +260,16 @@ func parseAdapter(raw map[int][][]byte) (information []*AdapterInformation, err 
 // parseThermal ...
 //
 func parseThermal(raw map[int][][]byte) (information []*ThermalInformation, err error) {
-	//todo
+	/*
+		for _, values := range raw {
+			info := &ThermalInformation{}
+			for _, value := range values {
+				//todo
+				fmt.Println(string(value))
+			}
+			information = append(information, info)
+		}
+	*/
 	return
 }
 
@@ -217,6 +277,15 @@ func parseThermal(raw map[int][][]byte) (information []*ThermalInformation, err 
 // parseCooling ...
 //
 func parseCooling(raw map[int][][]byte) (information []*CoolingInformation, err error) {
-	//todo
+	/*
+		for _, values := range raw {
+			info := &CoolingInformation{}
+			for _, value := range values {
+				//todo
+				fmt.Println(string(value))
+			}
+			information = append(information, info)
+		}
+	*/
 	return
 }
