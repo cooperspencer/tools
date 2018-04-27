@@ -32,20 +32,26 @@ func TestParse(t *testing.T) {
 
 	require.NotEmpty(t, parsed.BatteryInformation)
 	require.Len(t, parsed.BatteryInformation, 2)
-
-	require.Equal(t, parsed.BatteryInformation[0].Number, 0)
-	require.Equal(t, parsed.BatteryInformation[0].Level, 100)
-	require.Equal(t, parsed.BatteryInformation[0].Status, "Full")
-	require.Equal(t, parsed.BatteryInformation[0].DesignCapacity, 3464)
-	require.Equal(t, parsed.BatteryInformation[0].LastFullCapacity, 2864)
-	require.Equal(t, parsed.BatteryInformation[0].LastFullCapacityPercent, 82)
-
-	require.Equal(t, parsed.BatteryInformation[1].Number, 1)
-	require.Equal(t, parsed.BatteryInformation[1].Level, 96)
-	require.Equal(t, parsed.BatteryInformation[1].Status, "Unknown")
-	require.Equal(t, parsed.BatteryInformation[1].DesignCapacity, 1877)
-	require.Equal(t, parsed.BatteryInformation[1].LastFullCapacity, 1446)
-	require.Equal(t, parsed.BatteryInformation[1].LastFullCapacityPercent, 77)
+	for _, battery := range parsed.BatteryInformation {
+		switch battery.Number {
+		case 0:
+			require.Equal(t, battery.Number, 0)
+			require.Equal(t, battery.Level, 100)
+			require.Equal(t, battery.Status, "Full")
+			require.Equal(t, battery.DesignCapacity, 3464)
+			require.Equal(t, battery.LastFullCapacity, 2864)
+			require.Equal(t, battery.LastFullCapacityPercent, 82)
+			break
+		case 1:
+			require.Equal(t, battery.Number, 1)
+			require.Equal(t, battery.Level, 96)
+			require.Equal(t, battery.Status, "Unknown")
+			require.Equal(t, battery.DesignCapacity, 1877)
+			require.Equal(t, battery.LastFullCapacity, 1446)
+			require.Equal(t, battery.LastFullCapacityPercent, 77)
+			break
+		}
+	}
 
 	require.NotEmpty(t, parsed.AdapterInformation)
 	require.Len(t, parsed.AdapterInformation, 1)
@@ -55,41 +61,52 @@ func TestParse(t *testing.T) {
 
 	require.NotEmpty(t, parsed.CoolingInformation)
 	require.Len(t, parsed.CoolingInformation, 7)
-
-	require.Equal(t, parsed.CoolingInformation[0].Number, 0)
-	require.Equal(t, parsed.CoolingInformation[0].Processor, 0)
-	require.Equal(t, parsed.CoolingInformation[0].ProcessorMax, 10)
-	require.Equal(t, parsed.CoolingInformation[0].Note, "")
-
-	require.Equal(t, parsed.CoolingInformation[1].Number, 1)
-	require.Equal(t, parsed.CoolingInformation[1].Processor, 0)
-	require.Equal(t, parsed.CoolingInformation[1].ProcessorMax, 10)
-	require.Equal(t, parsed.CoolingInformation[1].Note, "")
-
-	require.Equal(t, parsed.CoolingInformation[2].Number, 2)
-	require.Equal(t, parsed.CoolingInformation[2].Processor, 0)
-	require.Equal(t, parsed.CoolingInformation[2].ProcessorMax, 0)
-	require.Equal(t, parsed.CoolingInformation[2].Note, "intel_powerclamp no state information available")
-
-	require.Equal(t, parsed.CoolingInformation[3].Number, 3)
-	require.Equal(t, parsed.CoolingInformation[3].Processor, 0)
-	require.Equal(t, parsed.CoolingInformation[3].ProcessorMax, 0)
-	require.Equal(t, parsed.CoolingInformation[3].Note, "x86_pkg_temp no state information available")
-
-	require.Equal(t, parsed.CoolingInformation[4].Number, 4)
-	require.Equal(t, parsed.CoolingInformation[4].Processor, 0)
-	require.Equal(t, parsed.CoolingInformation[4].ProcessorMax, 10)
-	require.Equal(t, parsed.CoolingInformation[4].Note, "")
-
-	require.Equal(t, parsed.CoolingInformation[5].Number, 5)
-	require.Equal(t, parsed.CoolingInformation[5].Processor, 0)
-	require.Equal(t, parsed.CoolingInformation[5].ProcessorMax, 10)
-	require.Equal(t, parsed.CoolingInformation[5].Note, "")
-
-	require.Equal(t, parsed.CoolingInformation[6].Number, 6)
-	require.Equal(t, parsed.CoolingInformation[6].Processor, 0)
-	require.Equal(t, parsed.CoolingInformation[6].ProcessorMax, 0)
-	require.Equal(t, parsed.CoolingInformation[6].Note, "pch_wildcat_point no state information available")
+	for _, cooling := range parsed.CoolingInformation {
+		switch cooling.Number {
+		case 0:
+			require.Equal(t, cooling.Number, 0)
+			require.Equal(t, cooling.Processor, 0)
+			require.Equal(t, cooling.ProcessorMax, 10)
+			require.Equal(t, cooling.Note, "")
+			break
+		case 1:
+			require.Equal(t, cooling.Number, 1)
+			require.Equal(t, cooling.Processor, 0)
+			require.Equal(t, cooling.ProcessorMax, 10)
+			require.Equal(t, cooling.Note, "")
+			break
+		case 2:
+			require.Equal(t, cooling.Number, 2)
+			require.Equal(t, cooling.Processor, 0)
+			require.Equal(t, cooling.ProcessorMax, 0)
+			require.Equal(t, cooling.Note, "intel_powerclamp no state information available")
+			break
+		case 3:
+			require.Equal(t, cooling.Number, 3)
+			require.Equal(t, cooling.Processor, 0)
+			require.Equal(t, cooling.ProcessorMax, 0)
+			require.Equal(t, cooling.Note, "x86_pkg_temp no state information available")
+			break
+		case 4:
+			require.Equal(t, cooling.Number, 4)
+			require.Equal(t, cooling.Processor, 0)
+			require.Equal(t, cooling.ProcessorMax, 10)
+			require.Equal(t, cooling.Note, "")
+			break
+		case 5:
+			require.Equal(t, cooling.Number, 5)
+			require.Equal(t, cooling.Processor, 0)
+			require.Equal(t, cooling.ProcessorMax, 10)
+			require.Equal(t, cooling.Note, "")
+			break
+		case 6:
+			require.Equal(t, cooling.Number, 6)
+			require.Equal(t, cooling.Processor, 0)
+			require.Equal(t, cooling.ProcessorMax, 0)
+			require.Equal(t, cooling.Note, "pch_wildcat_point no state information available")
+			break
+		}
+	}
 
 	require.NotEmpty(t, parsed.ThermalInformation)
 	require.Len(t, parsed.ThermalInformation, 1)
