@@ -46,9 +46,9 @@ type AdapterInformation struct {
 type ThermalInformation struct {
 	Number            int
 	Status            string
-	Degree            float32
+	Degree            float64
 	Unit              string
-	CriticalTripPoint float32
+	CriticalTripPoint float64
 }
 
 //
@@ -294,12 +294,22 @@ func parseThermal(raw map[int][][]byte) (information []*ThermalInformation, err 
 			splittedVal := bytes.Split(value, []byte(","))
 			//todo
 			if len(splittedVal) == 2 {
-				//info.Status
-				//info.Degree
-				//info.Unit
+				info.Status = string(bytes.TrimSpace(splittedVal[0]))
+				info.Unit = string(splittedVal[1][len(splittedVal[1])-1:])
+
+				d, err := strconv.ParseFloat(string(bytes.TrimSpace(bytes.Split(splittedVal[1], []byte(" degrees "))[0])), 64)
+				if err == nil {
+					info.Degree = d
+				}
+
 				continue
 			}
-			//info.CriticalTripPoint
+
+			ctpSplit := bytes.Split(bytes.Split(splittedVal[0], []byte("at temperature"))[1], []byte("degree"))
+			ctp, err := strconv.ParseFloat(string(bytes.TrimSpace(ctpSplit[0])), 64)
+			if err == nil {
+				info.CriticalTripPoint = ctp
+			}
 		}
 		information = append(information, info)
 	}
