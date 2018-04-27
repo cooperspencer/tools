@@ -2,7 +2,6 @@ package acpi
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"os/exec"
 	"strconv"
@@ -145,10 +144,9 @@ func Parse(raw []byte) (*ACPI, error) {
 		}
 
 		number, err := strconv.Atoi(string(bytes.TrimSpace(kv[0][7:])))
-		if err != nil {
-			fmt.Println(err)
+		if err == nil {
+			tmpMap[string(kv[0][:7])][number] = append(tmpMap[string(kv[0][:7])][number], kv[1])
 		}
-		tmpMap[string(kv[0][:7])][number] = append(tmpMap[string(kv[0][:7])][number], kv[1])
 	}
 
 	for k, v := range tmpMap {
