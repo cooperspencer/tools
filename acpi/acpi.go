@@ -71,65 +71,95 @@ func init() {
 }
 
 //
-// Battery runs `acpi -b` command and returns the raw output
+// Battery runs `acpi -b` command and returns a slice of BatteryInformation structs
 //
-func Battery() ([]byte, error) {
-	return exec.Command(path, "-b").Output()
+func Battery() ([]*BatteryInformation, error) {
+	out, err := exec.Command(path, "-b").Output()
+	if err != nil {
+		return nil, err
+	}
+
+	information, err := parse(out)
+	if err != nil {
+		return nil, err
+	}
+	return information.BatteryInformation, nil
 }
 
 //
-// AcAdapter runs `acpi -a` command and returns the raw output
+// AcAdapter runs `acpi -a` command and returns a slice of AdapterInformation structs
 //
-func AcAdapter() ([]byte, error) {
-	return exec.Command(path, "-a").Output()
+func AcAdapter() ([]*AdapterInformation, error) {
+	out, err := exec.Command(path, "-a").Output()
+	if err != nil {
+		return nil, err
+	}
+
+	information, err := parse(out)
+	if err != nil {
+		return nil, err
+	}
+	return information.AdapterInformation, nil
 }
 
 //
-// Thermal runs `acpi -t` command and returns the raw output
+// Thermal runs `acpi -t` command and returns a slice of ThermalInformation structs
 //
-func Thermal() ([]byte, error) {
-	return exec.Command(path, "-t").Output()
+func Thermal() ([]*ThermalInformation, error) {
+	out, err := exec.Command(path, "-t").Output()
+	if err != nil {
+		return nil, err
+	}
+
+	information, err := parse(out)
+	if err != nil {
+		return nil, err
+	}
+	return information.ThermalInformation, nil
 }
 
 //
-// Cooling runs `acpi -c` command and returns the raw output
+// Cooling runs `acpi -c` command and returns a slice of CoolingInformation structs
 //
-func Cooling() ([]byte, error) {
-	return exec.Command(path, "-c").Output()
+func Cooling() ([]*CoolingInformation, error) {
+	out, err := exec.Command(path, "-c").Output()
+	if err != nil {
+		return nil, err
+	}
+
+	information, err := parse(out)
+	if err != nil {
+		return nil, err
+	}
+	return information.CoolingInformation, nil
 }
 
 //
-// Everything runs `acpi -V` command and returns the raw output
+// Everything runs `acpi -V` command and returns an ACPI struct
 //
-func Everything() ([]byte, error) {
-	return exec.Command(path, "-V").Output()
+func Everything() (*ACPI, error) {
+	out, err := exec.Command(path, "-V").Output()
+	if err != nil {
+		return nil, err
+	}
+	return parse(out)
 }
 
 //
-// ShowEmpty runs `acpi -s` command and returns the raw output
+// Raw runs the acpi command with the given arguments and returns an ACPI struct
 //
-func ShowEmpty() ([]byte, error) {
-	return exec.Command(path, "-s").Output()
+func Raw(args ...string) (*ACPI, error) {
+	out, err := exec.Command(path, args...).Output()
+	if err != nil {
+		return nil, err
+	}
+	return parse(out)
 }
 
 //
-// Details runs `acpi -i` command and returns the raw output
+// parse converts the given raw acpi output to an ACPI struct
 //
-func Details() ([]byte, error) {
-	return exec.Command(path, "-i").Output()
-}
-
-//
-// Raw runs the acpi command with the given arguments
-//
-func Raw(args ...string) ([]byte, error) {
-	return exec.Command(path, args...).Output()
-}
-
-//
-// Parse converts the given raw acpi output to an ACPI struct
-//
-func Parse(raw []byte) (*ACPI, error) {
+func parse(raw []byte) (*ACPI, error) {
 	lines := bytes.Split(raw[:len(raw)-1], []byte("\n"))
 
 	info := &ACPI{}
